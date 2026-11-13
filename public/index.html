@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comeback Next Semester — Academic Task & Focus Suite</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-header">
+        <div class="brand-logo">🎓</div>
+        <div class="brand-text">
+          <h1>Comeback Next Semester</h1>
+          <span>Academic Redemption Mode</span>
+        </div>
+        <button id="themeToggle" class="icon-btn" title="Toggle Dark/Light Theme">🌓</button>
+      </div>
+
+      <!-- Semester Comeback Progress -->
+      <div class="comeback-card">
+        <div class="comeback-top">
+          <span>Semester Comeback Meter</span>
+          <strong id="comebackPercent">0%</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="comebackBar" style="width: 0%"></div>
+        </div>
+        <small id="comebackStats">0 / 0 tasks conquered</small>
+      </div>
+
+      <!-- Smart Lists -->
+      <nav class="nav-section">
+        <div class="nav-label">SMART VIEWS</div>
+        <button class="nav-item active" data-view="inbox">
+          <span class="nav-icon">📥</span>
+          <span class="nav-title">Inbox</span>
+          <span class="badge" id="count-inbox">0</span>
+        </button>
+        <button class="nav-item" data-view="today">
+          <span class="nav-icon">📅</span>
+          <span class="nav-title">Today</span>
+          <span class="badge" id="count-today">0</span>
+        </button>
+        <button class="nav-item" data-view="next7">
+          <span class="nav-icon">🗓️</span>
+          <span class="nav-title">Next 7 Days</span>
+          <span class="badge" id="count-next7">0</span>
+        </button>
+        <button class="nav-item" data-view="all">
+          <span class="nav-icon">📋</span>
+          <span class="nav-title">All Tasks</span>
+          <span class="badge" id="count-all">0</span>
+        </button>
+      </nav>
+
+      <!-- Courses / Custom Lists -->
+      <nav class="nav-section lists-section">
+        <div class="nav-label-row">
+          <span class="nav-label">COURSES & LISTS</span>
+          <button id="openAddListBtn" class="icon-btn small" title="Add Course List">+</button>
+        </div>
+        <div id="customListsContainer"></div>
+      </nav>
+
+      <!-- Bottom Smart Lists -->
+      <nav class="nav-section">
+        <button class="nav-item" data-view="completed">
+          <span class="nav-icon">✅</span>
+          <span class="nav-title">Completed</span>
+          <span class="badge" id="count-completed">0</span>
+        </button>
+        <button class="nav-item" data-view="trash">
+          <span class="nav-icon">🗑️</span>
+          <span class="nav-title">Trash</span>
+          <span class="badge" id="count-trash">0</span>
+        </button>
+      </nav>
+
+      <!-- Embedded TickTick Pomodoro Focus Widget -->
+      <div class="pomo-widget">
+        <div class="pomo-header">
+          <span>🍅 Focus Timer</span>
+          <div class="pomo-modes">
+            <button class="pomo-mode active" data-minutes="25">25m</button>
+            <button class="pomo-mode" data-minutes="5">5m</button>
+            <button class="pomo-mode" data-minutes="15">15m</button>
+          </div>
+        </div>
+        <div class="pomo-clock" id="pomoDisplay">25:00</div>
+        <div class="pomo-active-task" id="pomoTaskLabel">Select a task to focus on</div>
+        <div class="pomo-controls">
+          <button id="pomoStartBtn" class="btn-primary">Start Focus</button>
+          <button id="pomoResetBtn" class="btn-secondary">Reset</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MIDDLE PANE: TASK LIST -->
+    <main class="task-pane">
+      <header class="pane-header">
+        <div class="header-left">
+          <button id="mobileMenuBtn" class="icon-btn mobile-only">☰</button>
+          <h2 id="currentViewTitle">Inbox</h2>
+        </div>
+        <div class="header-actions">
+          <input type="search" id="searchInput" placeholder="Search tasks..." class="search-input" />
+          <select id="sortSelect" class="sort-select" title="Sort tasks">
+            <option value="priority">Sort: Priority</option>
+            <option value="dueDate">Sort: Due Date</option>
+            <option value="newest">Sort: Newest</option>
+          </select>
+        </div>
+      </header>
+
+      <!-- Quick Add Task Form -->
+      <form id="quickAddForm" class="quick-add-box">
+        <input
+          type="text"
+          id="quickTitleInput"
+          placeholder="+ Add task to conquer this semester (Press Enter)..."
+          required
+          autocomplete="off"
+        />
+        <div class="quick-add-meta">
+          <input type="date" id="quickDateInput" title="Due Date" />
+          <select id="quickPriorityInput" title="Priority">
+            <option value="0">Priority: None</option>
+            <option value="1">🔵 Low</option>
+            <option value="2">🟠 Medium</option>
+            <option value="3">🔴 High</option>
+          </select>
+          <select id="quickListInput" title="Course / List">
+            <option value="">📥 Inbox</option>
+          </select>
+          <button type="submit" class="btn-primary">Add</button>
+        </div>
+      </form>
+
+      <!-- Tasks Container -->
+      <div class="task-list-scroll" id="taskListContainer"></div>
+    </main>
+
+    <!-- RIGHT PANE: TASK DETAIL INSPECTOR -->
+    <section class="detail-pane" id="detailPane">
+      <div class="empty-detail" id="emptyDetailState">
+        <div class="empty-icon">🚀</div>
+        <h3>Select a task to inspect</h3>
+        <p>Break assignments into subtasks, set priorities, or start a Pomodoro focus session.</p>
+      </div>
+
+      <div class="detail-editor hidden" id="detailEditor">
+        <div class="detail-topbar">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="detailCompleted" />
+            <span class="checkmark"></span>
+            <span class="status-label">Mark Completed</span>
+          </label>
+          <div class="detail-top-actions">
+            <button id="focusThisTaskBtn" class="btn-chip" title="Focus on this task">🍅 Focus</button>
+            <button id="deleteTaskBtn" class="icon-btn danger" title="Move to Trash / Delete">🗑️</button>
+          </div>
+        </div>
+
+        <input type="text" id="detailTitle" class="detail-title-input" placeholder="Task title..." />
+
+        <div class="detail-meta-grid">
+          <div class="meta-field">
+            <label>Due Date</label>
+            <input type="date" id="detailDueDate" />
+          </div>
+          <div class="meta-field">
+            <label>Priority</label>
+            <select id="detailPriority">
+              <option value="0">None</option>
+              <option value="1">🔵 Low</option>
+              <option value="2">🟠 Medium</option>
+              <option value="3">🔴 High</option>
+            </select>
+          </div>
+          <div class="meta-field">
+            <label>Course / List</label>
+            <select id="detailListId">
+              <option value="">📥 Inbox</option>
+            </select>
+          </div>
+          <div class="meta-field">
+            <label>Pomodoros</label>
+            <div class="pomo-counter-box">
+              <span id="detailPomoCount">0 / 1</span> 🍅
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <label>Study Notes & Strategy</label>
+          <textarea
+            id="detailNotes"
+            rows="4"
+            placeholder="Write formulas, lecture timestamps, or revision strategy..."
+          ></textarea>
+        </div>
+
+        <div class="detail-section">
+          <label>Subtasks & Checklist</label>
+          <div id="subtasksList" class="subtasks-list"></div>
+          <form id="addSubtaskForm" class="add-subtask-form">
+            <input type="text" id="newSubtaskInput" placeholder="+ Add step or subtask..." autocomplete="off" />
+            <button type="submit" class="btn-secondary">Add</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODAL: ADD NEW COURSE LIST -->
+  <div class="modal-backdrop hidden" id="addListModal">
+    <div class="modal-card">
+      <h3>Add Course or Subject List</h3>
+      <form id="addListForm">
+        <div class="form-group">
+          <label>Course / List Name</label>
+          <input type="text" id="newListName" placeholder="e.g., PHYS 101: Mechanics" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Icon</label>
+            <select id="newListIcon">
+              <option value="📚">📚 Books</option>
+              <option value="💻">💻 CS / Code</option>
+              <option value="📐">📐 Math</option>
+              <option value="🧪">🧪 Science</option>
+              <option value="✍️">✍️ Essay</option>
+              <option value="🔥">🔥 Goal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Color Tag</label>
+            <input type="color" id="newListColor" value="#4772fa" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="cancelAddListBtn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Create List</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
